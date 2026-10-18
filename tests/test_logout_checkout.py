@@ -34,21 +34,24 @@ def test_logout_after_login(driver):
 # TC_CHECKOUT_01
 def test_checkout_logged_out_requires_login(driver):
     """Verify that attempting to checkout while logged out prompts for login."""
-    # Add product to cart (while logged out)
+    # Add product to cart (while logged out) and navigate via modal
     products_page = ProductsPage(driver)
     products_page.open_products_page(BASE_URL)
-    products_page.add_first_product_to_cart(navigate_to_cart=False)
+    products_page.add_first_product_to_cart(navigate_to_cart=True)
     
-    # Navigate to cart
+    # Wait for cart page to load
+    import time
+    time.sleep(2)
+    
+    # Verify we're on cart page
     cart_page = CartPage(driver)
-    cart_page.open_cart_page(BASE_URL)
+    assert "/view_cart" in driver.current_url or "/cart" in driver.current_url, "Should be on cart page"
     
     # Click Proceed to Checkout
     cart_page.proceed_to_checkout()
     
-    # Wait a moment for redirect or modal
-    import time
-    time.sleep(2)
+    # Wait for redirect or modal
+    time.sleep(3)
     
     # Verify either on login page or modal shows
     current_url = driver.current_url
@@ -58,15 +61,21 @@ def test_checkout_logged_out_requires_login(driver):
     if not is_on_login_page:
         try:
             from selenium.webdriver.common.by import By
-            register_link = driver.find_element(
-                By.XPATH,
-                "//u[contains(text(), 'Register / Login')]"
+            from selenium.webdriver.support.ui import WebDriverWait
+            from selenium.webdriver.support import expected_conditions as EC
+            
+            short_wait = WebDriverWait(driver, 5)
+            register_link = short_wait.until(
+                EC.presence_of_element_located((
+                    By.XPATH,
+                    "//u[contains(text(), 'Register / Login')] | //a[contains(text(), 'Register / Login')]"
+                ))
             )
             is_on_login_page = register_link.is_displayed()
         except Exception:
             pass
     
-    assert is_on_login_page, "Should redirect to login page or show login prompt"
+    assert is_on_login_page, f"Should redirect to login page or show login prompt. Current URL: {current_url}"
 
 
 # TC_CHECKOUT_02

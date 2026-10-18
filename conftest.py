@@ -1,4 +1,5 @@
 
+import os
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -51,3 +52,26 @@ def driver(request):
     except Exception:
         pass
     browser.quit()
+
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """
+    Hook to capture screenshot on test failure.
+    Runs after each test phase (setup, call, teardown).
+    """
+    outcome = yield
+    report = outcome.get_result()
+    
+    # Only capture screenshot if the test call phase failed
+    if report.when == "call" and report.failed:
+        browser = item.funcargs.get("driver")
+        if browser:
+            # Create screenshots directory if it doesn't exist
+            os.makedirs("screenshots", exist_ok=True)
+            
+            # Save screenshot with test name
+            screenshot_path = f"screenshots/{item.name}.png"
+            browser.save_screenshot(screenshot_path)
+            print(f"\nScreenshot saved: {screenshot_path}")

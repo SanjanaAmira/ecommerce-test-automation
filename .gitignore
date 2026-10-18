@@ -3,3 +3,7 @@ __pycache__/
 .pytest_cache/
 .env
 
+
+# Test reports and screenshots
+reports/
+screenshots/

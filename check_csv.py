@@ -20,10 +20,24 @@ required_columns = [
     "Notes",
 ]
 
+# Optional columns that are allowed but not required
+optional_columns = ["Automated?"]
+
 with csv_file.open("r", encoding="utf-8-sig", newline="") as file:
     reader = csv.DictReader(file)
-
-    if reader.fieldnames != required_columns:
+    
+    # Check if all required columns are present
+    if reader.fieldnames:
+        missing_cols = set(required_columns) - set(reader.fieldnames)
+        extra_cols = set(reader.fieldnames) - set(required_columns) - set(optional_columns)
+        
+        if missing_cols:
+            print(f"ERROR: Missing required columns: {missing_cols}")
+            raise SystemExit(1)
+        
+        if extra_cols:
+            print(f"WARNING: Unexpected columns (will be ignored): {extra_cols}")
+    else:
         print("ERROR: CSV headers do not match the expected columns.")
         print("Found:", reader.fieldnames)
         raise SystemExit(1)

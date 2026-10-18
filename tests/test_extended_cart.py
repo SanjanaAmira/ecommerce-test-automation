@@ -10,12 +10,16 @@ def test_remove_item_from_cart(driver):
     products_page = ProductsPage(driver)
     products_page.open_products_page(BASE_URL)
     
-    # Add product to cart
-    products_page.add_first_product_to_cart(navigate_to_cart=False)
+    # Add product to cart and navigate via modal
+    products_page.add_first_product_to_cart(navigate_to_cart=True)
     
-    # Navigate to cart
+    # Wait a moment for cart page to load
+    import time
+    time.sleep(1)
+    
+    # Verify we're on cart page
     cart_page = CartPage(driver)
-    cart_page.open_cart_page(BASE_URL)
+    assert "/view_cart" in driver.current_url or "/cart" in driver.current_url, "Should be on cart page"
     
     # Verify cart has items
     assert cart_page.cart_has_items(), "Cart should have items before removal"
