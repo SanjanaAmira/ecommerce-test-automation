@@ -66,8 +66,8 @@ for row_number, row in enumerate(rows, start=2):
         if not row[column].strip():
             errors.append(f"Missing value in '{column}'")
 
-    if row["Status"].strip() not in ("Pass", "Fail", "Not Run"):
-        errors.append("Status must be Pass, Fail, or Not Run")
+    if row["Status"].strip() not in ("Pass", "Fail", "Not Run", ""):
+        errors.append("Status must be Pass, Fail, Not Run, or empty")
 
     if errors:
         errors_found = True
