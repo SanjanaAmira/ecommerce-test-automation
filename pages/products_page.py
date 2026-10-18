@@ -41,6 +41,28 @@ class ProductsPage(BasePage):
         By.CSS_SELECTOR,
         "button[data-dismiss='modal']"
     )
+    
+    # Search results
+    SEARCH_RESULTS_TITLE = (
+        By.XPATH,
+        "//h2[contains(., 'Searched Products')]"
+    )
+    
+    NO_RESULTS_MESSAGE = (
+        By.XPATH,
+        "//p[contains(text(), 'No product found')]"
+    )
+    
+    # Second product selectors
+    SECOND_PRODUCT_NAME = (
+        By.XPATH,
+        "(//div[@class='features_items']//div[@class='productinfo text-center']//p)[2]"
+    )
+    
+    SECOND_ADD_TO_CART = (
+        By.XPATH,
+        "(//div[@class='features_items']//div[@class='productinfo text-center']//a[contains(@class, 'add-to-cart')])[2]"
+    )
 
     def open_products_page(self, base_url):
         self.open(f"{base_url}/products")
@@ -71,6 +93,74 @@ class ProductsPage(BasePage):
         
         product_button = self.wait.until(
             EC.visibility_of_element_located(self.FIRST_ADD_TO_CART)
+        )
+
+        self.driver.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});",
+            product_button
+        )
+
+        ActionChains(self.driver).move_to_element(
+            product_button
+        ).pause(0.5).click().perform()
+
+        # Use shorter wait for modal handling
+        short_wait = WebDriverWait(self.driver, 3)
+        
+        # Handle the modal that appears after adding to cart
+        if navigate_to_cart:
+            # Click "View Cart" in the modal
+            try:
+                view_cart = short_wait.until(
+                    EC.element_to_be_clickable(self.VIEW_CART_LINK)
+                )
+                view_cart.click()
+            except Exception:
+                # Modal didn't appear, continue
+                pass
+        else:
+            # Dismiss the modal by clicking "Continue Shopping"
+            try:
+                continue_btn = short_wait.until(
+                    EC.element_to_be_clickable(self.CONTINUE_SHOPPING_BUTTON)
+                )
+                continue_btn.click()
+            except Exception:
+                # Modal didn't appear or already closed
+                pass
+
+    def search_results_are_shown(self):
+        """Check if search results title is displayed."""
+        try:
+            return self.wait.until(
+                EC.visibility_of_element_located(self.SEARCH_RESULTS_TITLE)
+            ).is_displayed()
+        except Exception:
+            return False
+
+    def no_results_message_shown(self):
+        """Check if 'No product found' message is displayed."""
+        try:
+            return self.find(self.NO_RESULTS_MESSAGE).is_displayed()
+        except Exception:
+            return False
+
+    def get_second_product_name(self):
+        """Get the name of the second product."""
+        return self.find(self.SECOND_PRODUCT_NAME).text
+
+    def add_second_product_to_cart(self, navigate_to_cart=False):
+        """
+        Add second product to cart.
+        
+        Args:
+            navigate_to_cart: If True, attempts to navigate to cart via modal.
+                            If False, dismisses modal and stays on products page.
+        """
+        from selenium.webdriver.support.ui import WebDriverWait
+        
+        product_button = self.wait.until(
+            EC.visibility_of_element_located(self.SECOND_ADD_TO_CART)
         )
 
         self.driver.execute_script(
