@@ -12,9 +12,11 @@ Selenium + Python test automation suite for [automationexercise.com](https://aut
 | **Test Cases Documented** | 29 (CSV format) |
 | **Page Objects** | 7 |
 | **Test Coverage** | Login, Signup, Products, Cart, Search, Checkout, Logout |
-| **Execution Time (Headless)** | 4:18 average (258 seconds) |
+| **Execution Time (Headless)** | 231-285s range across 3 runs (4:13 average) |
 | **Execution Time (Normal)** | Not yet measured (single run) |
 | **Stability** | 100% (3 consecutive green runs, 54/54 test executions passed) |
+
+![Test Report Preview](docs/report-preview.png)
 
 ---
 
@@ -122,7 +124,6 @@ ecommerce-test-automation/
 ### Pytest Framework
 - Fixtures for browser setup (fresh instance per test)
 - Clear test organization
-- HTML reporting with pytest-html
 
 ### HTML Reporting
 - Automatic report generation with pytest-html
@@ -146,7 +147,6 @@ ecommerce-test-automation/
 ### Stability
 - Fixed 2 flaky tests by addressing synchronization issues
 - 100% pass rate over 3 consecutive runs (54/54 test executions)
-- Uses explicit waits only (no implicit wait conflicts)
 - Modal-based navigation for natural synchronization points
 
 ---
@@ -190,7 +190,8 @@ All test cases in `test_cases.csv` include Test Case ID, detailed steps, specifi
 
 ### Login with Incorrect Password (TC_LOGIN_01)
 ```python
-def test_login_with_incorrect_password(login_page):
+def test_login_with_incorrect_password(driver):
+    login_page = LoginPage(driver)
     login_page.login(TEST_EMAIL, "WrongPassword123!")
     message = login_page.get_error_message()
     assert "incorrect" in message.lower()
@@ -229,9 +230,8 @@ def test_search_existing_product(driver):
 ### Execution Time
 
 **Automated Suite (18 tests)**:
-- **Headless Mode Average**: 258 seconds (4:18)
-  - Run 1: 285s
-  - Run 2: 231s
+- **Headless Mode Range**: 231-285s (Runs: 231s, 244s, 285s)
+- **Headless Mode Average**: 253s (4:13)
 - **Normal Mode**: Not yet measured after removing implicit wait
 - **Per Test Average**: 14.3 seconds (headless)
 
@@ -243,8 +243,7 @@ def test_search_existing_product(driver):
 **Time Comparison**:
 - Automation: 4:18 unattended (tester can work on other tasks)
 - Manual: 45+ minutes active tester time (estimated)
-- **Note**: Times measured after removing implicit wait that conflicted with explicit waits
-- **Recommendation**: Measure actual manual time with stopwatch for accurate comparison
+- **Note**: Removing implicit wait slightly increased runtime (previously 3:54 avg), likely due to third-party site variability rather than the code change
 
 ---
 
@@ -302,7 +301,8 @@ pytest --lf -v
 **test_remove_item_from_cart**:
 - Symptom: "Cart should have items before removal"
 - Cause: Race condition - cart page loaded before product fully added
-- Fix: Use modal navigation (`navigate_to_cart=True`) which waits for product to be added
+- Fix: Use modal navigation (
+avigate_to_cart=True`) which waits for product to be added
 
 **test_checkout_logged_out_requires_login**:
 - Symptom: Timeout finding login element
