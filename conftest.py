@@ -40,17 +40,12 @@ def driver(request):
         browser.maximize_window()
 
     # Set timeouts
-    browser.implicitly_wait(10)  # Implicit wait for element finding
     browser.set_page_load_timeout(30)  # Page load timeout
     browser.set_script_timeout(30)  # JavaScript execution timeout
 
     yield browser
 
-    # Cleanup: Clear cookies and quit browser
-    try:
-        browser.delete_all_cookies()
-    except Exception:
-        pass
+    # Cleanup: quit browser
     browser.quit()
 
 

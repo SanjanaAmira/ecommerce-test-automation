@@ -13,18 +13,8 @@ def test_search_existing_product(driver):
     # Scroll to top to find search
     driver.execute_script("window.scrollTo(0, 0);")
     
-    # Use products page search functionality
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support import expected_conditions as EC
-    
-    # Find and use search on products page
-    search_input = products_page.wait.until(
-        EC.visibility_of_element_located((By.ID, "search_product"))
-    )
-    search_input.send_keys("Top")
-    
-    search_button = products_page.find((By.ID, "submit_search"))
-    search_button.click()
+    # Use products page search method
+    products_page.search_for("Top")
     
     # Verify search results are shown
     assert products_page.search_results_are_shown(), "Search results title should be displayed"
@@ -41,18 +31,8 @@ def test_search_nonexistent_product(driver):
     # Scroll to top to find search
     driver.execute_script("window.scrollTo(0, 0);")
     
-    # Use products page search functionality
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support import expected_conditions as EC
-    
-    # Find and use search on products page
-    search_input = products_page.wait.until(
-        EC.visibility_of_element_located((By.ID, "search_product"))
-    )
-    search_input.send_keys("zzzznonexistent999")
-    
-    search_button = products_page.find((By.ID, "submit_search"))
-    search_button.click()
+    # Use products page search method
+    products_page.search_for("zzzznonexistent999")
     
     # Verify no results message is shown
     assert products_page.search_results_are_shown(), "Search results title should be displayed"

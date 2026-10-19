@@ -53,6 +53,10 @@ class ProductsPage(BasePage):
         "//p[contains(text(), 'No product found')]"
     )
     
+    # Search box
+    SEARCH_INPUT = (By.ID, "search_product")
+    SEARCH_BUTTON = (By.ID, "submit_search")
+    
     # Second product selectors
     SECOND_PRODUCT_NAME = (
         By.XPATH,
@@ -148,6 +152,16 @@ class ProductsPage(BasePage):
     def get_second_product_name(self):
         """Get the name of the second product."""
         return self.find(self.SECOND_PRODUCT_NAME).text
+
+    def search_for(self, search_term):
+        """
+        Search for products using the search box.
+        
+        Args:
+            search_term: Text to search for
+        """
+        self.type(self.SEARCH_INPUT, search_term)
+        self.click(self.SEARCH_BUTTON)
 
     def add_second_product_to_cart(self, navigate_to_cart=False):
         """
