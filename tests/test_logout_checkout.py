@@ -53,29 +53,9 @@ def test_checkout_logged_out_requires_login(driver):
     # Wait for redirect or modal
     time.sleep(3)
     
-    # Verify either on login page or modal shows
-    current_url = driver.current_url
-    is_on_login_page = "/login" in current_url
-    
-    # If not redirected, check for modal/link
-    if not is_on_login_page:
-        try:
-            from selenium.webdriver.common.by import By
-            from selenium.webdriver.support.ui import WebDriverWait
-            from selenium.webdriver.support import expected_conditions as EC
-            
-            short_wait = WebDriverWait(driver, 5)
-            register_link = short_wait.until(
-                EC.presence_of_element_located((
-                    By.XPATH,
-                    "//u[contains(text(), 'Register / Login')] | //a[contains(text(), 'Register / Login')]"
-                ))
-            )
-            is_on_login_page = register_link.is_displayed()
-        except Exception:
-            pass
-    
-    assert is_on_login_page, f"Should redirect to login page or show login prompt. Current URL: {current_url}"
+    # Use CheckoutPage to verify login is required
+    checkout_page = CheckoutPage(driver)
+    assert checkout_page.is_login_modal_shown(), f"Should redirect to login page or show login prompt. Current URL: {driver.current_url}"
 
 
 # TC_CHECKOUT_02

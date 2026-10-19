@@ -20,3 +20,17 @@ class LoginPage(BasePage):
 
     def get_error_message(self):
         return self.get_text(self.ERROR_MESSAGE)
+
+    def is_email_field_missing(self):
+        """Check if email field has browser 'required' validation error."""
+        email_element = self.find(self.EMAIL_INPUT)
+        return self.driver.execute_script(
+            "return arguments[0].validity.valueMissing", email_element
+        )
+
+    def is_email_format_invalid(self):
+        """Check if email field has browser format validation error."""
+        email_element = self.find(self.EMAIL_INPUT)
+        return self.driver.execute_script(
+            "return arguments[0].validity.typeMismatch", email_element
+        )

@@ -1,6 +1,5 @@
 
 import pytest
-from selenium.webdriver.common.by import By
 
 from config import BASE_URL, TEST_EMAIL, TEST_PASSWORD
 from pages.home_page import HomePage
@@ -32,21 +31,15 @@ def test_login_with_unregistered_email(login_page):
 
 
 # TC_LOGIN_03
-def test_login_with_empty_fields(login_page, driver):
+def test_login_with_empty_fields(login_page):
     login_page.login("", "")
-    email = driver.find_element(*LoginPage.EMAIL_INPUT)
-    assert driver.execute_script(
-        "return arguments[0].validity.valueMissing", email
-    )
+    assert login_page.is_email_field_missing()
 
 
 # TC_LOGIN_04
-def test_login_with_invalid_email_format(login_page, driver):
+def test_login_with_invalid_email_format(login_page):
     login_page.login("testuser.com", "AnyPassword123!")
-    email = driver.find_element(*LoginPage.EMAIL_INPUT)
-    assert driver.execute_script(
-        "return arguments[0].validity.typeMismatch", email
-    )
+    assert login_page.is_email_format_invalid()
 
 
 # TC_LOGIN_05

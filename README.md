@@ -12,8 +12,8 @@ Selenium + Python test automation suite for [automationexercise.com](https://aut
 | **Test Cases Documented** | 29 (CSV format) |
 | **Page Objects** | 7 |
 | **Test Coverage** | Login, Signup, Products, Cart, Search, Checkout, Logout |
-| **Execution Time (Headless)** | 3:54 average (234 seconds) |
-| **Execution Time (Normal)** | 4:36 (276 seconds) |
+| **Execution Time (Headless)** | 4:18 average (258 seconds) |
+| **Execution Time (Normal)** | Not yet measured (single run) |
 | **Stability** | 100% (3 consecutive green runs, 54/54 test executions passed) |
 
 ---
@@ -97,8 +97,13 @@ ecommerce-test-automation/
 │
 ├── reports/                    # HTML test reports (gitignored)
 ├── screenshots/                # Failure screenshots (gitignored)
+├── docs/                       # Additional documentation
+│   ├── ROOT_CAUSE_ANALYSIS.md # Root cause analysis of fixed flaky tests
+│   └── STABILITY_RUNS.md      # Raw output from stability test runs
 ├── conftest.py                # Pytest fixtures and hooks
 ├── config.py                  # Configuration management
+├── pytest.ini                 # Pytest configuration
+├── .env.example               # Environment variable template
 ├── test_cases.csv             # 29 documented test cases
 ├── check_csv.py               # CSV validation script
 └── requirements.txt           # Python dependencies
@@ -117,7 +122,7 @@ ecommerce-test-automation/
 ### Pytest Framework
 - Fixtures for browser setup (fresh instance per test)
 - Clear test organization
-- Parameterized test support
+- HTML reporting with pytest-html
 
 ### HTML Reporting
 - Automatic report generation with pytest-html
@@ -131,13 +136,18 @@ ecommerce-test-automation/
 
 ### Headless Mode
 - Run without visible browser window
-- 15% faster execution than normal mode
 - Ideal for CI/CD pipelines
+
+### Explicit Waits
+- Uses explicit waits for reliable synchronization
+- No implicit wait (avoids conflicts)
+- Predictable, targeted waiting strategies
 
 ### Stability
 - Fixed 2 flaky tests by addressing synchronization issues
 - 100% pass rate over 3 consecutive runs (54/54 test executions)
-- Uses explicit waits for reliable synchronization
+- Uses explicit waits only (no implicit wait conflicts)
+- Modal-based navigation for natural synchronization points
 
 ---
 
@@ -219,12 +229,11 @@ def test_search_existing_product(driver):
 ### Execution Time
 
 **Automated Suite (18 tests)**:
-- **Headless Average**: 234 seconds (3:54)
-  - Run 1: 224s
-  - Run 2: 236s
-  - Run 3: 243s
-- **Normal Mode**: 276 seconds (4:36)
-- **Per Test**: ~13 seconds (headless)
+- **Headless Mode Average**: 258 seconds (4:18)
+  - Run 1: 285s
+  - Run 2: 231s
+- **Normal Mode**: Not yet measured after removing implicit wait
+- **Per Test Average**: 14.3 seconds (headless)
 
 **Manual Execution** (estimated):
 - Estimated: 45-54 minutes (18 tests × 2.5-3 min each)
@@ -232,8 +241,9 @@ def test_search_existing_product(driver):
 - **Note**: Actual manual measurement not yet performed
 
 **Time Comparison**:
-- Automation: 3:54 unattended (tester can work on other tasks)
+- Automation: 4:18 unattended (tester can work on other tasks)
 - Manual: 45+ minutes active tester time (estimated)
+- **Note**: Times measured after removing implicit wait that conflicted with explicit waits
 - **Recommendation**: Measure actual manual time with stopwatch for accurate comparison
 
 ---
@@ -301,7 +311,7 @@ pytest --lf -v
 
 **Result**: 100% stability - 54/54 test executions passed across 3 runs
 
-See `FLAKY_TESTS_FIXED.md` for detailed root cause analysis and interview defense.
+**Details**: See `docs/ROOT_CAUSE_ANALYSIS.md` for complete technical analysis
 
 ---
 
@@ -329,9 +339,9 @@ See `FLAKY_TESTS_FIXED.md` for detailed root cause analysis and interview defens
 
 ## 📖 Additional Documentation
 
-- `FLAKY_TESTS_FIXED.md` - Root cause analysis of fixed flaky tests
-- `STABILITY_RUNS.md` - Raw output from 3 stability test runs
-- `CSV_IMPROVEMENTS.md` - Test case quality improvements
+- `docs/ROOT_CAUSE_ANALYSIS.md` - Detailed analysis of fixed flaky tests
+- `docs/STABILITY_RUNS.md` - Raw output from stability test runs with timing data
+- `test_cases.csv` - 29 documented test cases with automation rationale
 
 ---
 
